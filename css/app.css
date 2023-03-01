@@ -1,0 +1,99 @@
+*{
+    margin:0;
+    box-sizing: border-box;
+}
+
+
+/* no scrolling thing on iphone */
+html {
+    height  : 100%;
+    overflow: hidden;
+    position: relative;
+}
+body {
+    height  : 100%;
+    position: relative;
+    background-color: #191919;
+}
+
+:root {
+  touch-action: pan-x pan-y;
+  height: 100% 
+}
+
+.center{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* defualt e' quella dei bianchi (quindi non girata) */
+#board{
+    width: 100vw;
+    height: 100vw;
+    max-width: 700px;
+    max-height: 700px;
+    position: absolute;
+}
+
+/* girata */
+#board.black{
+    transform-origin: 0% 0%;
+    transform: rotate(180deg) translate(-50%, -50%);
+}
+
+/*rigiro tutto*/
+/* rigirare i piece (perche' la board e' al contrario e se non lo metto vedo i piece messi sottosopra) */
+#board.black > #pieces > .piece {transform: rotate(-180deg);}
+
+#boardImg{
+    width: 100%;
+    height: 100%;
+    position:relative;
+}
+
+.piece{
+    --x: 0;
+    --y: 0;
+
+    width: calc(100% / 8);
+    height: calc(100% / 8);
+    position: absolute;
+
+    /* piece.x = 8 : x : 100 */
+    left: calc(100 * var(--x) / 8 * 1%);
+    /* piece.y = 8 : y : 100 */
+    top: calc(100 * var(--y) / 8 * 1%);
+}
+
+.piece.active{
+    width: calc(100% / 5.5);
+    height: calc(100% / 5.5);
+}
+.piece.topLevel{z-index: 100;}
+
+/* higlighted the possible moves -------------------------------*/
+.piece.moves > .dot{
+    width: 25%;
+    height: 25%;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    z-index: 3;
+}
+
+.piece.moves > :not(.dot){
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.piece.moves > .prevsCordinates{background-color: rgba(255, 255, 0, 0.37);}
+.piece.moves > .newCordinates{background-color: rgba(255, 255, 0, 0.5);}
+
+
+#singOutBtn{
+	position: fixed;
+	bottom: 5%;
+	left: 5%;
+}
