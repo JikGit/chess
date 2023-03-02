@@ -29,7 +29,7 @@
     top: 3%;
     left: 5%;
     cursor: pointer;
-    transition: transform .25s ease; /* Animation */
+    transition: transform .25s; /* Animation */
 }
 #fineGame > svg:hover{transform: scale(1.2);}
 

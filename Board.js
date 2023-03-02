@@ -47,7 +47,7 @@ function Board({idMatch, statoPartita, setStatoPartita, playerColor, spectator})
 		let p = newPieces[activePiece.style.getPropertyValue("--y")][activePiece.style.getPropertyValue("--x")]
 		//determinate the position in the board (from cordinate to index of the board)
 		let [posX, posY] = getPosFromEvent(e);
-		let [newX, newY] = findIndexBoard(posX, posY, boardRef, nRowPieces, playerColor === "black");
+		let [newX, newY] = findIndexBoard(posX, posY, boardRef, nRowPieces, boardRef.current.classList.contains("black")); //contains e non playerColor perche' se giro la board non cambia il playerColor ma la classe si
 
 		//rimetto il piece all'altezza normale
 		activePiece.classList.remove("topLevel", "active");
@@ -90,7 +90,7 @@ function Board({idMatch, statoPartita, setStatoPartita, playerColor, spectator})
 		let shiftX = posX - boardRef.current.getBoundingClientRect().x - activePiece.offsetWidth / 2;
 		let shiftY = posY - boardRef.current.getBoundingClientRect().y - activePiece.offsetWidth / 2;
 		//se nero devo ruotare di 180 gradi perche' la scacchiera e' ruotata
-		if (playerColor === "black"){
+		if (boardRef.current.classList.contains("black")){
 			shiftX = boardRef.current.offsetWidth - (shiftX + activePiece.offsetWidth) ;
 			shiftY = boardRef.current.offsetHeight -  (shiftY + activePiece.offsetWidth) ;
 		}
@@ -161,6 +161,7 @@ function Board({idMatch, statoPartita, setStatoPartita, playerColor, spectator})
 	//update playerColor in localStorage
 	return(
 		<div 
+			ref={boardRef}
 			id="board" 
 			className={`${playerColor}`}
 			onMouseDown={clickPiece} 
@@ -171,7 +172,7 @@ function Board({idMatch, statoPartita, setStatoPartita, playerColor, spectator})
 			onTouchMove={dragPiece}
 		>
 
-			<div ref={boardRef} id="boardPieces">
+			<div  id="boardPieces">
 				{
 					[...Array(64).keys()].map((number) => {
 						return <div key={number}></div>
