@@ -5,7 +5,7 @@ function SingOut() {
 	}
 
 	return (
-		<button id="singOutBtn" onClick={exitAcc}>SingOut</button>
+		<button id="singOutBtn" onClick={exitAcc}>Esci</button>
 	);
 }
 

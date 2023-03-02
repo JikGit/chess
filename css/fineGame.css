@@ -47,12 +47,6 @@
 #fineGame.sconfitta > .circle{background-color: #666564;}
 #fineGame.vittoria > .circle{background-color: #2a9518;}
 
-/* ruoto se nera la board */
-#board.black > #fineGame{
-    transform: rotate(-180deg) translate(-50%, -50%);
-    transform-origin: 0% 0%;
-}
-
 #fineGame > .center h1,
 #fineGame > .center > p{
     width: 100%;
@@ -63,7 +57,7 @@
 #fineGame h1 {font-size: 5vh; top: 50%;}
 #fineGame p {font-size: 2.5vh; top: 80%;}
 
-#board > #fineGame > #userNameVittoria{
+#fineGame > #userNameVittoria{
     position: absolute;
     color: black;
     top: 40%;

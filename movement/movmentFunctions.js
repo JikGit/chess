@@ -2,18 +2,18 @@ import moveSound from '../assets/sounds/move.mp3'
 import takeSound from '../assets/sounds/take.mp3'
 import PieceClass from '../PieceClass'
 
-function updatePiecePos(newPieces, p, newX, newY, lastLog, playSound = false){
-	//controllo enPassant, se mi muovo di due e non sono nella posizione di fare due mosse (quindi per forza enPassant)
-	if (lastLog !== undefined && Object.keys(lastLog).length !== 0 && p.type === "pawn" && Math.abs(lastLog.data.y - lastLog.data.newY) === 2 && Math.abs(p.y - newY) === 2 && (p.color === "white" ? p.y !== 6 : p.y !== 1))
-		newPieces = updatePiecePos(newPieces, p, newX, newY + (p.color === "white" ? 1 : -1), {}) //lastLog vuoto perche' serve solo per arrocco e enPassant
+function updatePiecePos(newPieces, p, newX, newY, playSound = false){
+	//controllo enPassant, se mi muovo in obliquo con un pawn e non c'e' nessuno da mangiare dove mi sto muovendo (perforza enPassant perche' presupposto che ogni mossa che arriva qui e' valida)
+	if (p.type === "pawn" && Math.abs(p.x - newX) === 1 && !newPieces[newY][newX])
+		newPieces = updatePiecePos(newPieces, p, newX, newY + (p.color === "white" ? 1 : -1)) 
 	//controllo per castle
 	if (p.type === "king" && Math.abs(p.x - newX) === 2)
-		newPieces = updatePiecePos(newPieces, newPieces[newY][newX === 2 ? 0 : 7], newX === 2 ? p.x-1 : p.x+1, newY, {}) //lastLog vuoto perche' serve solo per arrocco e enPassan
+		newPieces = updatePiecePos(newPieces, newPieces[newY][newX === 2 ? 0 : 7], newX === 2 ? p.x-1 : p.x+1, newY) //lastLog vuoto perche' serve solo per arrocco e enPassan
 	//promotion
 	if (p.type === "pawn" && newY === (p.color === "white" ? 0 : 7))
 		p = new PieceClass(p.x, p.y,"queen",p.color, `${p.color[0]}Q.svg`, `P${p.id}`)
-	//se il pezzo dove si deve muovere e' occupato vuoldire che sta mangiando quindi play del suono che mangia, altrimenti si e' mosso
 
+	//se il pezzo dove si deve muovere e' occupato vuoldire che sta mangiando quindi play del suono che mangia, altrimenti si e' mosso
 	if (playSound) new Audio(newPieces[newY][newX] ? takeSound : moveSound).play();
 
 	//aggiorno la matrice

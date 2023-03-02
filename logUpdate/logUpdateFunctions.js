@@ -6,12 +6,12 @@ function moveTillLastLog(newPieces, logs){
 	return newPieces;
 }
 	
-function moveToLog(newPieces, record){
+function moveToLog(newPieces, record, playSound = false){
 	if (!record) return
 	const {newX, newY, x, y} = record.data;
 	const p = newPieces[y][x];
-	//update delle posizioni senza scrivere sul db
-	newPieces = updatePiecePos(newPieces, p, newX, newY);
+
+	newPieces = updatePiecePos(newPieces, p, newX, newY, playSound);
 	return newPieces;
 }
 

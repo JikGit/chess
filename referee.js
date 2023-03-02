@@ -166,7 +166,7 @@ function notCheckMoves(x, y, moves, board, kingColor, lastLog){
     let legalMoves = []
     moves.forEach((move) => {
         //simulo il movimento e poi vedo se e' check
-        let newBoard = updatePiecePos(JSON.parse(JSON.stringify(board)), JSON.parse(JSON.stringify(board))[y][x], move.x, move.y, lastLog)
+        let newBoard = updatePiecePos(JSON.parse(JSON.stringify(board)), JSON.parse(JSON.stringify(board))[y][x], move.x, move.y)
         if (!isCheck(newBoard, kingColor, lastLog))
             legalMoves.push(move);
     })
@@ -175,8 +175,8 @@ function notCheckMoves(x, y, moves, board, kingColor, lastLog){
 
 function isCheckMate(board, kingColor, lastLog){
     let checkMate = true;
-    board.forEach((pieceRow, row) => {
-        return pieceRow.forEach((piece, col) => {
+    board.forEach((pieceRow) => {
+        return pieceRow.forEach((piece) => {
             if (!piece || piece.color !== kingColor) return;
             if (notCheckMoves(piece.x, piece.y, getPossibleMoves(piece.x, piece.y, board, lastLog), board, kingColor, lastLog).length !== 0){
                 checkMate = false;

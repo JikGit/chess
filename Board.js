@@ -3,7 +3,7 @@ import { onSnapshot } from 'firebase/firestore';
 
 import { nRowPieces } from './initialate/BoardScheme.js';
 import generateBoard from './initialate/generateBoard.js';
-import { initialateGame } from './initialate/initialateGame.js';
+import { checkForNewMovedPiece } from './initialate/initialateGame';
 
 import Piece from './Piece.js'
 import writeLogToDb from "./firebase/writeLogToDb";
@@ -17,27 +17,22 @@ import { getValidMoves, isCheck, isCheckMate } from './referee'
 import checkSound from './assets/sounds/check.mp3'
 import sconfittaSound from './assets/sounds/check.mp3'
 
-
-function Board({userName, idMatch, statoPartita, setStatoPartita}){
+function Board({idMatch, statoPartita, setStatoPartita, playerColor, spectator}){
     const [pieces, setPieces] = useState([[],[],[],[],[],[],[],[]]);
-	const [nLog, setNLog] = useState(0);
-	const [playerColor, setPlayerColor] = useState();
 	const [colorTurn, setColorTurn] = useState("white");
 	const [lastLog, setLastLog] = useState(undefined);
 	const [possibleMoves, setPossibleMoves] = useState([]);
 	const [activePiece, setActivePiece] = useState();
 	const [lastMovedPiece, setLastMovedPiece] = useState(null); 
-	const [spectator, setSpectator] = useState("");
 
 	const boardRef = useRef();
 
 	function updateStates(p, newX, newY, newPieces){
-		//aggiorno nLog e colore del prossimo turno e gli ultimi pezzi mossi
-		setNLog(parseInt(nLog)+2);
+		//aggiorno colore del prossimo turno e gli ultimi pezzi mossi
 		setColorTurn(p.color === "black" ? "white" : "black")
 		setLastMovedPiece({newX: newX, newY:newY, x:p.x, y:p.y});
 		//muovo il pezzo
-		setPieces(updatePiecePos(newPieces, p, newX, newY, lastLog, true))
+		setPieces(updatePiecePos(newPieces, p, newX, newY, true))
 		//resetto l'activepiece
 		setActivePiece(undefined);
 		//elimino i posssibleMoves dallo schermo perche' mosso il piece
@@ -59,7 +54,7 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 		//update delle posizioni se validMove e se il suo turno 
 		if (colorTurn === playerColor && possibleMoves.some( move => move.x === newX && move.y === newY)){
 			//aggiorno il db solo se la inserisco, se lascio stringa vuota non lo aggiorna
-			writeLogToDb(p, newX, newY, `${idMatch}/logs${playerColor}/log${nLog}`);
+			writeLogToDb(p, newX, newY, `${idMatch}/logs${playerColor}/log${lastLog ? parseInt(lastLog.id.split("log")[1])+1 : 0}`);
 			//effetto sonoro
 			updateStates(p, newX, newY, newPieces);
 		//altrimenti da mettere il pezzo dove stava prima quindi richiamo quello che fa il css ogni volta
@@ -106,21 +101,6 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 		activePiece.style.top = shiftY + "px";
 	}
 
-	//aggiorno la posizione se nuovo log
-	useEffect(() => {
-		// lastLog = {data: {x,y,newX,newY,color,createdAt}, id:logwhite10}
-		// se chiamato dopo moveToLastLog viene mosso due volte il log, cosi si controlla che nella posizione che si voglia spostare c'e' un pezzo
-		if (!lastLog || !pieces[lastLog.data.y][lastLog.data.x]) return;
-
-		let newPieces = moveToLog([...pieces], lastLog)
-		//refresh delle possibilita' dopo lo spostamento
-		setPossibleMoves(activePiece && getValidMoves(parseInt(activePiece.style.getPropertyValue("--x")),parseInt(activePiece.style.getPropertyValue("--y")), [...newPieces], lastLog));
-		setPieces(newPieces);
-		//il prossimo e' quello che ora e' in ascolto del db visto che siamo in ascolto solo dei lastLog degli avversari
-		setColorTurn(playerColor);
-		//setto il pieceMosso come lastMovedPiece
-		setLastMovedPiece({newX: lastLog.data.newX, newY:lastLog.data.newY, x: lastLog.data.x, y:lastLog.data.y});
-	}, [lastLog])
 
 	useEffect(() => {
 		//sconfitta
@@ -141,20 +121,33 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 			if (isMate) setStatoPartita("stalemate");
 	}, [colorTurn])
 
+	//aggiorno la posizione se nuovo log
+	useEffect(() => {
+		// lastLog = {data: {x,y,newX,newY,color,createdAt}, id:logwhite10}
+		// se chiamato dopo moveToLastLog viene mosso due volte il log, cosi si controlla che nella posizione che si voglia spostare c'e' un pezzo
+		if (!lastLog || !pieces[lastLog.data.y][lastLog.data.x]) return;
+
+		let newPieces = moveToLog([...pieces], lastLog, true)
+		//refresh delle possibilita' dopo lo spostamento
+		setPossibleMoves(activePiece && getValidMoves(parseInt(activePiece.style.getPropertyValue("--x")),parseInt(activePiece.style.getPropertyValue("--y")), [...newPieces], lastLog));
+		setPieces(newPieces);
+		//il prossimo e' quello che ora e' in ascolto del db visto che siamo in ascolto solo dei lastLog degli avversari
+		setColorTurn(playerColor);
+		//setto il pieceMosso come lastMovedPiece
+		setLastMovedPiece({newX: lastLog.data.newX, newY:lastLog.data.newY, x: lastLog.data.x, y:lastLog.data.y});
+	}, [lastLog])
+
 	//initzializzo il game, boardColor, i pezzi della scacchiera, il turno 
 	useEffect(() => {
 		let pieces = generateBoard();
-		initialateGame(pieces, idMatch, userName).then(({nLog, colorTurn, boardColor, newPieces, lastMovedPiece, lastLog, spectator}) => {
-			setNLog(nLog);
-			setColorTurn(colorTurn);
-			setPlayerColor(boardColor);
+		checkForNewMovedPiece(pieces, idMatch, playerColor).then(({colorTurn, newPieces, lastMovedPiece, lastLog}) => {
 			setPieces(newPieces);
 			setLastMovedPiece(lastMovedPiece);
 			setLastLog(lastLog);
-			setSpectator(spectator);
+			setColorTurn(colorTurn);
 
 			//real time data dal db, ogni volta che c'e un aggiornamento aggiorna lo state lastLog
-			getLastLogQuery("matches", `${idMatch}/logs${(boardColor === "white" ? "black" : "white")}`).then((query) => {
+			getLastLogQuery("matches", `${idMatch}/logs${(playerColor === "white" ? "black" : "white")}`).then((query) => {
 				onSnapshot(query, (arrLastLog) => {
 					//se non e' nullo l'array aggiorno lo state dell'ultimo log (e poi viene chiamato l'useEffect che aggiorna la board) oppure se ho gia' fatto il log che sta leggendo ora dal server
 					if (arrLastLog.docs.length && (!lastLog || arrLastLog.docs[0].id.split("log")[1] > lastLog.id.split("log")[1]))
@@ -166,11 +159,10 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 	}, []);
 
 	//update playerColor in localStorage
-	// useEffect(() => {localStorage.setItem("playerColor", playerColor)}, [playerColor])
 	return(
 		<div 
 			id="board" 
-			className={`${playerColor} center`}
+			className={`${playerColor}`}
 			onMouseDown={clickPiece} 
 			onMouseUp={checkMovePiece} 
 			onMouseMove={dragPiece} 
@@ -197,8 +189,7 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 					//all moves
 					possibleMoves && possibleMoves.map(move => {
 						if (!move) return null;
-						const key = `x:${move.x}y:${move.y}`;
-						return <Move key={key} move={move} type="dot"/>
+						return <Move key={`x:${move.x}y:${move.y}`} move={move} type="dot"/>
 					})
 				}
 			</div>
@@ -209,8 +200,7 @@ function Board({userName, idMatch, statoPartita, setStatoPartita}){
 					pieces.map(pieceRow => {
 						return pieceRow.map((piece, index)=> {
 							if (!piece) return null;
-							const key = `${piece.id}-row-${index}`;
-							return <Piece key={key} piece={piece}/>
+							return <Piece key={`${piece.id}-row-${index}`} piece={piece}/>
 						})
 					})
 				}

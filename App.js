@@ -1,5 +1,5 @@
 import './css/app.css';
-import './css/board.css'
+import './css/boardPieces.css'
 import './css/fineGame.css';
 import SingIn from './auth/SingIn';
 import Game from './Game';
