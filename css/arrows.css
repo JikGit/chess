@@ -1,0 +1,25 @@
+#arrows{
+	position: absolute;
+    cursor: pointer;
+	bottom: -10px;
+	width: 100%;
+}
+
+#arrows > .arrow {
+	width: 35px;
+	height: 35px;
+	color: white;
+	position: absolute;
+    transition: transform .25s ; /* Animation */
+}
+
+/* #arrows > .arrow:hover{transform: scale(1.2);} */
+
+#arrows > .left{left: 20%;}
+#arrows > .right{right: 20%;}
+
+
+#arrows svg{
+	width: 100%;
+	height: 100%;
+}

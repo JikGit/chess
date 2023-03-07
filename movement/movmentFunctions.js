@@ -2,9 +2,9 @@ import moveSound from '../assets/sounds/move.mp3'
 import takeSound from '../assets/sounds/take.mp3'
 import PieceClass from '../PieceClass'
 
-function updatePiecePos(newPieces, p, newX, newY, playSound = false){
+function updatePiecePos(newPieces, p, newX, newY, playSound = false, ){
 	//controllo enPassant, se mi muovo in obliquo con un pawn e non c'e' nessuno da mangiare dove mi sto muovendo (perforza enPassant perche' presupposto che ogni mossa che arriva qui e' valida)
-	if (p.type === "pawn" && Math.abs(p.x - newX) === 1 && !newPieces[newY][newX])
+	if (p.type === "pawn" && Math.abs(p.x - newX) === 1 && !newPieces[newY][newX] && p.y - newY == (p.color === "white" ? 1 : -1)) 
 		newPieces = updatePiecePos(newPieces, p, newX, newY + (p.color === "white" ? 1 : -1)) 
 	//controllo per castle
 	if (p.type === "king" && Math.abs(p.x - newX) === 2)
@@ -23,7 +23,6 @@ function updatePiecePos(newPieces, p, newX, newY, playSound = false){
 	newPieces[newY][newX] = p;
 	return newPieces
 }
-
 
 //trova l'index x,y del pezzo dalla maatrice pieces
 function findIndexBoard(posX, posY, containerRef, indexBoard, black = false){
@@ -46,8 +45,5 @@ function getPosFromEvent(e){
 	} else if (e.tposYpe === 'mousedown' || e.type === 'mouseup' || e.type === 'mousemove' || e.type === 'mouseover'|| e.type==='mouseout' || e.type==='mouseenter' || e.type==='mouseleave') 
 		return [e.clientX, e.clientY];
 }
-
-
-
 
 export {updatePiecePos, findIndexBoard, getPosFromEvent}

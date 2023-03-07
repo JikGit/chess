@@ -1,6 +1,7 @@
 *{
     margin:0;
     box-sizing: border-box;
+	user-select: none; 
 }
 
 /* no scrolling thing on iphone */
@@ -105,16 +106,5 @@ body {
     cursor: pointer;
 }
 
-/* switchButton, da nero a bianco */
-#switchBoard{
-	width: 20px;
-	height: 20px;
-	color: white;
-	position: absolute;
-	left: -5%;
-    cursor: pointer;
-    transition: transform .25s ; /* Animation */
-}
 
-#switchBoard:hover{transform: scale(1.2);}
 

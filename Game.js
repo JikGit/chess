@@ -2,7 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import { faAngleRight, faAngleLeft, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
 
 import Board from './Board'
 import SingOut from './auth/SingOut'
@@ -17,6 +17,8 @@ function Game({userName}) {
 	const [winnerName, setWinnerName] = useState("");
 	const [playerColor, setPlayerColor] = useState();
 	const [spectator, setSpectator] = useState("");
+	const [leftArrowClicked, setLeftArrowClicked] = useState(false);
+	const [rightArrowClicked, setRightArrowClicked] = useState(false);
 
 	//se modifico lo stato della partita vedo come e' finita e metto lo schermo della vittoria/sconfitta/draw/stalemate
 	useEffect(() => {
@@ -49,12 +51,20 @@ function Game({userName}) {
 			{playerColor &&
 				<div className="center" id="game">
 					{/*Rotate board*/}
-					<FontAwesomeIcon icon={faArrowsRotate} id="switchBoard" onClick={() => {document.getElementById("board").classList.toggle("black")}}/>
+					<div id="switchBoard"> 
+						<FontAwesomeIcon icon={faArrowsRotate} onClick={() => {document.getElementById("board").classList.toggle("black")}}/> 
+					</div>
+					{/*Arrows*/}
+					<div id="arrows" >
+						<div onMouseDown={() => setLeftArrowClicked(true)} onMouseUp={() => setLeftArrowClicked(false)} className='arrow left'><FontAwesomeIcon icon={faAngleLeft}/></div>
+						<div onMouseDown={() => setRightArrowClicked(true)} onMouseUp={() => setRightArrowClicked(false)} className='arrow right'><FontAwesomeIcon icon={faAngleRight}/></div>
+					</div>
 					{/*Board*/}
-					<Board userName={userName} idMatch={idMatch} statoPartita={statoPartita} setStatoPartita={setStatoPartita} spectator={spectator} playerColor={playerColor}/>
+					<Board userName={userName} idMatch={idMatch} statoPartita={statoPartita} setStatoPartita={setStatoPartita} spectator={spectator} playerColor={playerColor} leftArrowClicked={leftArrowClicked} rightArrowClicked={rightArrowClicked} setRightArrowClicked={setRightArrowClicked}/>
 				</div>
 			}
-
+			
+			
 			{/*SingOut button*/}
         	<SingOut/>
     	</>

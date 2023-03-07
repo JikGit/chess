@@ -11,7 +11,7 @@ function Piece({piece}){
 
 	return (
 		<>
-			<img ref={pieceRef}  id={piece.id} className={`piece ${piece.type} ${piece.color}`} src={require(`./assets/img/${piece.imgName}`)} alt="piece"/>
+			<img ref={pieceRef}  id={piece.id} className={`piece ${piece.type} ${piece.color}`} src={require(`./assets/img/${localStorage.getItem("piecesTheme") || "4"}/${piece.imgName}`)} alt="piece"/>
 		</>
 	)
 }

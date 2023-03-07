@@ -1,6 +1,6 @@
 import { readCollection, doesDocExist } from '../firebase/firebaseFunctions'
 import { checkForExistingPlayer, addPlayer } from '../managePlayer';
-import { moveTillLastLog } from '../logUpdate/logUpdateFunctions';
+import { moveTillLastLog } from '../log/logUpdateFunctions';
 
 export async function initialateGame(idMatch, userName){
 	let boardColor = "white";
